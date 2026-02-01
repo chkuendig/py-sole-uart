@@ -9,6 +9,7 @@ from bleak import BleakClient
 from bleak.backends.device import BLEDevice
 
 from .const import SOLE_UART_NOTIFY, SOLE_UART_WRITE, MessageType, WorkoutMode
+from .dis import read_device_info as read_ble_device_info
 from .models import DeviceInfo, MachineState, WorkoutData
 from .utils import (
     build_ack,

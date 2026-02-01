@@ -17,6 +17,14 @@ class DeviceInfo:
     max_incline: int  # percentage
     user_segment: int
 
+    # Standard BLE Device Information Service (DIS) fields
+    manufacturer: Optional[str] = None
+    model_number: Optional[str] = None
+    serial_number: Optional[str] = None
+    sw_version: Optional[str] = None
+    hw_version: Optional[str] = None
+    fw_version: Optional[str] = None
+
     @property
     def units(self) -> str:
         """Return units as string."""
