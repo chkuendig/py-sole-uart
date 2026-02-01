@@ -276,7 +276,7 @@ Dyaco equipment uses proprietary UART-over-BLE services for the full-featured pr
 
 #### Primary Service: ISSC/Microchip Transparent UART
 
-> **Source**: [MyBluetoothLE.java:29-31](sole_fitness_jadx/sources/com/dyaco/ideabussdk_sole/bluetooth/MyBluetoothLE.java#L29-L31)
+> **Source**: [MyBluetoothLE.java:29-31](apps/sole_fitness_jadx/sources/com/dyaco/ideabussdk_sole/bluetooth/MyBluetoothLE.java#L29-L31)
 
 The primary UART service uses a vendor-specific UUID with the prefix `49535343`, which is ASCII for **"ISSC"** - the vendor ID for ISSC Technologies (now part of Microchip Technology Inc.). This prefix identifies the BLE chip manufacturer, not the fitness equipment brand. All Dyaco brands (SOLE, Spirit, XTERRA, Fuel) use ISSC chips with this service.
 
@@ -299,7 +299,7 @@ The primary UART service uses a vendor-specific UUID with the prefix `49535343`,
 
 #### Secondary Service: Generic UART (Legacy)
 
-> **Source**: [MyBluetoothLE.java:32-34](sole_fitness_jadx/sources/com/dyaco/ideabussdk_sole/bluetooth/MyBluetoothLE.java#L32-L34)
+> **Source**: [MyBluetoothLE.java:32-34](apps/sole_fitness_jadx/sources/com/dyaco/ideabussdk_sole/bluetooth/MyBluetoothLE.java#L32-L34)
 
 The secondary service uses the **Bluetooth SIG base UUID** format (`0000xxxx-0000-1000-8000-00805f9b34fb`) with custom identifiers in the `0xFFF0-0xFFF2` range. This was a common pattern for generic UART services before vendor-specific profiles became standard.
 
@@ -313,7 +313,7 @@ The secondary service uses the **Bluetooth SIG base UUID** format (`0000xxxx-000
 
 #### How the App Detects and Handles Both Services
 
-> **Source**: [MyBluetoothLE.java:106-163](sole_fitness_jadx/sources/com/dyaco/ideabussdk_sole/bluetooth/MyBluetoothLE.java#L106-L163)
+> **Source**: [MyBluetoothLE.java:106-163](apps/sole_fitness_jadx/sources/com/dyaco/ideabussdk_sole/bluetooth/MyBluetoothLE.java#L106-L163)
 
 The SOLE Fitness app scans for GATT services after connecting and handles both variants:
 
@@ -334,7 +334,7 @@ for (BluetoothGattService service : gattServices) {
 **Key findings from code analysis:**
 
 1. **Detection is automatic**: The app iterates through all GATT services and uses whichever UART service is present
-2. **The `isNewType` flag is set but never used**: Despite setting `isNewType = true` when the secondary service is found ([MyBluetoothLE.java:141](sole_fitness_jadx/sources/com/dyaco/ideabussdk_sole/bluetooth/MyBluetoothLE.java#L141)), this flag is **never read** anywhere in the codebase
+2. **The `isNewType` flag is set but never used**: Despite setting `isNewType = true` when the secondary service is found ([MyBluetoothLE.java:141](apps/sole_fitness_jadx/sources/com/dyaco/ideabussdk_sole/bluetooth/MyBluetoothLE.java#L141)), this flag is **never read** anywhere in the codebase
 3. **Protocol is identical**: Both services use the **exact same command/response format** (`[0x5B][LENGTH][CMD][DATA...][0x5D]`)
 4. **No parsing differences**: There are no conditional branches based on which service is used
 
@@ -345,7 +345,7 @@ for (BluetoothGattService service : gattServices) {
 | Primary (ISSC) | ✅ Yes | Modern equipment typically advertises both UART and FTMS |
 | Secondary (Legacy) | ❌ Unlikely | Older hardware predates FTMS adoption |
 
-**Evidence**: The **Sole+ app** (which only uses FTMS) has no references to either UART service UUID ([BleUuid.java](sole_plus_jadx/sources/com/soletreadmills/sole_v2/ble/BleUuid.java) contains only FTMS UUIDs). This suggests:
+**Evidence**: The **Sole+ app** (which only uses FTMS) has no references to either UART service UUID ([BleUuid.java](apps/sole_plus_jadx/sources/com/soletreadmills/sole_v2/ble/BleUuid.java) contains only FTMS UUIDs). This suggests:
 - Sole+ was designed for newer FTMS-capable equipment only
 - Older equipment with secondary UART likely doesn't support FTMS
 - The legacy SOLE Fitness app maintains backward compatibility via the secondary service
@@ -370,9 +370,35 @@ for (BluetoothGattService service : gattServices) {
 | `00002acd-0000-1000-8000-00805f9b34fb` | Treadmill Data (notify) |
 | `00002ad2-0000-1000-8000-00805f9b34fb` | Indoor Bike Data (notify) |
 | `00002ace-0000-1000-8000-00805f9b34fb` | Cross Trainer Data (notify) |
-| `00002ad3-0000-1000-8000-00805f9b34fb` | Training Status (notify) |
+| `00002ad3-0000-1000-1000-8000-00805f9b34fb` | Training Status (notify) |
 | `00002ada-0000-1000-8000-00805f9b34fb` | Fitness Machine Status (notify) |
 | `00002ad9-0000-1000-8000-00805f9b34fb` | Control Point (write/indicate) |
+
+#### FTMS Characteristic Handles (F65)
+
+From packet captures, these are the GATT handles used by the Sole+ app on F65:
+
+| Handle | UUID | Purpose |
+|--------|------|---------|
+| 0x002c | 0x2ACD | Treadmill Data (speed, distance, incline, calories, time) |
+| 0x002d | - | CCCD for Treadmill Data |
+| 0x004b | 0x2AD9 | FTMS Control Point (write 0x00=Request Control, 0xe9=Query Support) |
+| 0x004c | - | FTMS Control Point CCCD (enable indicate) |
+
+#### FTMS Connection Sequence
+
+From Sole+ app packet captures, the connection sequence is:
+
+```
+1. Enable notify on 0x002d, 0x0030, 0x0033, 0x0039, 0x003c, 0x003f
+2. Enable indicate on 0x004c (FTMS Control Point CCCD)
+3. Write 0x00 to 0x004b → FTMS Request Control
+4. Enable notify on 0x004f
+5. Write 0xe9 to 0x004b → Query program upload support (optional)
+6. Receive FTMS Treadmill Data on 0x002c
+```
+
+**Note**: Step 5 (0xe9) is optional for passive monitoring - it only checks if the device supports program uploads.
 
 ---
 
@@ -384,7 +410,7 @@ The Sole+ app uses **standard FTMS UUIDs** but extends the Control Point (0x2AD9
 
 ### Initialization Sequence
 
-From [FtmsDeviceManager.java](sole_plus_jadx/sources/com/soletreadmills/sole_v2/ble/manager/FtmsDeviceManager.java):1391-1392, the app sends these commands **unconditionally for ALL devices** on connection:
+From [FtmsDeviceManager.java](apps/sole_plus_jadx/sources/com/soletreadmills/sole_v2/ble/manager/FtmsDeviceManager.java):1391-1392, the app sends these commands **unconditionally for ALL devices** on connection:
 
 ```java
 // In initialize() method - sent for ALL devices
@@ -394,7 +420,7 @@ sendCmd(FitnessMachineControlPointCmd.getSupportProgram(), ...);  // 0xE9
 
 ### Sole-Specific Control Point Op Codes
 
-From [FitnessMachineControlPointOpCode.java](sole_plus_jadx/sources/com/soletreadmills/sole_v2/ble/code/FitnessMachineControlPointOpCode.java):
+From [FitnessMachineControlPointOpCode.java](apps/sole_plus_jadx/sources/com/soletreadmills/sole_v2/ble/code/FitnessMachineControlPointOpCode.java):
 
 | Op Code | Hex | Name | Purpose |
 |---------|-----|------|---------|
@@ -426,7 +452,7 @@ From [FitnessMachineControlPointOpCode.java](sole_plus_jadx/sources/com/soletrea
 
 ### PROGRAM_E1 Payload Format
 
-From [FitnessMachineControlPointCmd.java](sole_plus_jadx/sources/com/soletreadmills/sole_v2/ble/cmd/FitnessMachineControlPointCmd.java):95-145:
+From [FitnessMachineControlPointCmd.java](apps/sole_plus_jadx/sources/com/soletreadmills/sole_v2/ble/cmd/FitnessMachineControlPointCmd.java):95-145:
 
 ```
 [0xE1] [program_type] [age] [weight] [time_lo] [time_hi] [speed_lo] [speed_hi] [00] [max_level] [00] [target_hr] [00] [00] [00]
@@ -578,16 +604,18 @@ The DEVICE_INFO response tells you what controls are available:
 
 ### Operating Modes (CMD 0x03)
 
-| Mode | Hex | Description |
-|------|-----|-------------|
-| 1 | 0x01 | STOP |
-| 2 | 0x02 | IDLE |
-| 3 | 0x03 | RUNNING |
-| 4 | 0x04 | PAUSE |
-| 5 | 0x05 | COOLDOWN |
-| 6 | 0x06 | SUMMARY |
-| 7 | 0x07 | SLEEP |
-| 128 | 0x80 | READY (BLE not linked to workout) |
+> **⚠️ Model-Specific Variation**: Mode codes may vary between models. F65 appears to use 0x04 for RUNNING, while some documentation suggests 0x02 or 0x03. The simulation code in SoleProtocol.java uses mode 4 for active workouts. Test with your specific model to confirm.
+
+| Mode | Hex | Description | Notes |
+|------|-----|-------------|-------|
+| 1 | 0x01 | IDLE / STOP | On start screen, ready |
+| 2 | 0x02 | IDLE | May be used for SET_MODE command |
+| 3 | 0x03 | RUNNING? | Some models |
+| 4 | 0x04 | RUNNING / STARTING | F65, F80 - Workout active or countdown |
+| 5 | 0x05 | COOLDOWN | Cooldown phase |
+| 6 | 0x06 | PAUSED / SUMMARY | Workout paused or ended |
+| 7 | 0x07 | SLEEP | Sleep mode |
+| 128 | 0x80 | READY | BLE not linked - console control only |
 
 ### Device Info Response (CMD 0xF0)
 
@@ -627,6 +655,67 @@ Example (Treadmill): `5B08F0910000C80A0F125D`
 
 ---
 
+## UART Startup Sequence
+
+Based on treadonme's `Start()` function, the full initialization sequence for app-controlled workouts is:
+
+1. Connect to treadmill BLE service
+2. Subscribe to Notify characteristic (`49535343-1e4d-4bd9-ba61-23c647249616`)
+3. Send Get Device Info: `5B 01 F0 5D`
+4. Receive Device Info response, optionally echo it back
+5. Wait for HeartRateType message (0x09), ACK it with `5B 04 00 09 4F 4B 5D`
+6. Send User Profile (0x07): `5B 06 07 <sex> <age> <weight_hi> <weight_lo> <height> 5D`
+7. Send Program - Manual mode: `5B 03 08 10 01 5D`
+8. Send Workout Target (optional): `5B 05 04 <time_hi> <time_lo> <cal_hi> <cal_lo> 5D`
+9. Send Set Workout Mode Start: `5B 02 02 02 5D`
+10. **Disconnect** and wait ~5 seconds
+11. **Reconnect** to the device
+12. Send Get Device Info again: `5B 01 F0 5D`
+13. Treadmill belt should start (or be ready to start)
+
+> **Note**: The disconnect/reconnect after SetWorkoutMode (steps 10-11) appears to be required by treadonme. This may release control back to the console while still allowing the app to receive data.
+
+**Communication Rules:**
+- **Wait 300-500ms between commands** - the treadmill can't handle rapid messages
+- **Display must be active** - treadmill doesn't listen for connections in low power mode
+- **ACK most messages** - either with explicit ACK (`5B 04 00 XX 4F 4B 5D`) or by echoing
+- **First command is always 0xF0** - establishes communication
+
+---
+
+## Testing Results (F65)
+
+### Working Commands
+
+| Test | Command | Result | Notes |
+|------|---------|--------|-------|
+| Device Info | `5B01F05D` | ✅ Returns capabilities | Always works |
+| Mode Notifications | - | ✅ Receiving `5B0203XX5D` | Broadcasts every ~300ms |
+| START | `5B02F1015D` | ✅ Belt moves | Must be on Manual workout screen (mode 0x01) |
+| STOP | `5B02F1065D` | ✅ Belt stops | Receives ACK |
+
+### Commands Needing Investigation
+
+| Test | Command | Notes |
+|------|---------|-------|
+| Direct Speed | `5B02113C5D` | ❌ No response - may need different format |
+| Speed Up | `5B02F1025D` | ⚠️ May need ACK follow-up or specific mode |
+| Direct Incline | `5B0212055D` | ❌ No response - may need different format |
+
+### Fan Control
+
+**Summary**: Fan control via BLE is **NOT implemented** on F65.
+
+Tested F1 commands 0x07-0x0C: All produce console beep only, no fan change. The fan appears to be console-hardware only, not controllable via BLE protocol.
+
+### Key Finding: State Matters
+
+- **START only works** when user has navigated to Manual workout screen (mode=0x01/0x02)
+- **Commands ignored** when in demo/screensaver mode (mode=0x80)
+- **BLE connection may lock console** when proper UART handshake is completed (behavior varies)
+
+---
+
 ## Model Number Identification
 
 > **⚠️ UART Protocol Only**: This section describes device identification via the proprietary UART protocol. Getting the model number **requires sending a 0xF0 command** to the device - this is NOT passive. For passive identification, use the BLE device name from advertisements.
@@ -635,7 +724,7 @@ The **model number** (byte 3 of DEVICE_INFO response) is the canonical identifie
 
 ### Device Type Detection
 
-From [SoleProtocol.java](sole_fitness_jadx/sources/com/dyaco/ideabussdk_sole/protocol/SoleProtocol.java):1946-1955:
+From [SoleProtocol.java](apps/sole_fitness_jadx/sources/com/dyaco/ideabussdk_sole/protocol/SoleProtocol.java):1946-1955:
 
 | Device Type | ID | Model Ranges |
 |-------------|----|--------------|
@@ -659,7 +748,7 @@ if (model >= 128 && model < 192) {
 
 ### Brand Detection
 
-From [SoleProtocol.java](sole_fitness_jadx/sources/com/dyaco/ideabussdk_sole/protocol/SoleProtocol.java):1957-1969:
+From [SoleProtocol.java](apps/sole_fitness_jadx/sources/com/dyaco/ideabussdk_sole/protocol/SoleProtocol.java):1957-1969:
 
 | Brand | ID | Model Ranges |
 |-------|----|--------------|
@@ -689,7 +778,7 @@ if ((model >= 16 && model < 32) || (model >= 144 && model < 160)) {
 
 ### BLE Name Overrides (Firmware Bug Workarounds)
 
-Some devices report **incorrect model numbers** in the DEVICE_INFO protocol response. The app works around this by detecting the BLE device name and overriding the model after parsing (from [SoleProtocol.java](sole_fitness_jadx/sources/com/dyaco/ideabussdk_sole/protocol/SoleProtocol.java):1933-1945):
+Some devices report **incorrect model numbers** in the DEVICE_INFO protocol response. The app works around this by detecting the BLE device name and overriding the model after parsing (from [SoleProtocol.java](apps/sole_fitness_jadx/sources/com/dyaco/ideabussdk_sole/protocol/SoleProtocol.java):1933-1945):
 
 **How it works:**
 1. Model is first parsed from DEVICE_INFO response: `deviceModel = parseInt(response[3], 16)`
@@ -761,7 +850,7 @@ The model number is the **index into the DEVICE_NAME_LIST array** in each brand'
 
 ### SOLE Models
 
-From [Sole_DeviceModelList.java](sole_fitness_jadx/sources/com/dyaco/sole/custom/Sole_DeviceModelList.java):
+From [Sole_DeviceModelList.java](apps/sole_fitness_jadx/sources/com/dyaco/sole/custom/Sole_DeviceModelList.java):
 
 | Model # | Hex | Name | Type |
 |---------|-----|------|------|
@@ -791,7 +880,7 @@ From [Sole_DeviceModelList.java](sole_fitness_jadx/sources/com/dyaco/sole/custom
 
 ### Spirit Models
 
-From [Spirit_DeviceModelList.java](sole_fitness_jadx/sources/com/dyaco/sole/custom/Spirit_DeviceModelList.java):
+From [Spirit_DeviceModelList.java](apps/sole_fitness_jadx/sources/com/dyaco/sole/custom/Spirit_DeviceModelList.java):
 
 | Model # | Hex | Name | Type |
 |---------|-----|------|------|
@@ -831,7 +920,7 @@ From [Spirit_DeviceModelList.java](sole_fitness_jadx/sources/com/dyaco/sole/cust
 
 ### XTERRA Models
 
-From [Xterra_DeviceModelList.java](sole_fitness_jadx/sources/com/dyaco/sole/custom/Xterra_DeviceModelList.java):
+From [Xterra_DeviceModelList.java](apps/sole_fitness_jadx/sources/com/dyaco/sole/custom/Xterra_DeviceModelList.java):
 
 | Model # | Hex | Name | Type |
 |---------|-----|------|------|
@@ -867,7 +956,7 @@ From [Xterra_DeviceModelList.java](sole_fitness_jadx/sources/com/dyaco/sole/cust
 
 ### Fuel Models
 
-From [Fuel_DeviceModelList.java](sole_fitness_jadx/sources/com/dyaco/sole/custom/Fuel_DeviceModelList.java):
+From [Fuel_DeviceModelList.java](apps/sole_fitness_jadx/sources/com/dyaco/sole/custom/Fuel_DeviceModelList.java):
 
 | Model # | Hex | Name | Type |
 |---------|-----|------|------|
@@ -892,7 +981,7 @@ From [Fuel_DeviceModelList.java](sole_fitness_jadx/sources/com/dyaco/sole/custom
 
 The workout data format varies by device type. This is the **primary source of real-time metrics** during a workout.
 
-> **Source**: [SoleProtocol.java](sole_fitness_jadx/sources/com/dyaco/ideabussdk_sole/protocol/SoleProtocol.java) lines 2039-2222
+> **Source**: [SoleProtocol.java](apps/sole_fitness_jadx/sources/com/dyaco/ideabussdk_sole/protocol/SoleProtocol.java) lines 2039-2222
 
 **For Treadmill (deviceType=0):**
 
@@ -913,7 +1002,7 @@ The workout data format varies by device type. This is the **primary source of r
 
 **For Bike/Elliptical (deviceType=1 or 2):**
 
-> **Source**: [SoleProtocol.java](sole_fitness_jadx/sources/com/dyaco/ideabussdk_sole/protocol/SoleProtocol.java) lines 2125-2174
+> **Source**: [SoleProtocol.java](apps/sole_fitness_jadx/sources/com/dyaco/ideabussdk_sole/protocol/SoleProtocol.java) lines 2125-2174
 
 | Offset | Length | Field | Scale | pyftms Property |
 |--------|--------|-------|-------|-----------------|
@@ -935,7 +1024,7 @@ The workout data format varies by device type. This is the **primary source of r
 
 **Special Models (31, 30, 10) - Different Format:**
 
-> **Source**: [SoleProtocol.java](sole_fitness_jadx/sources/com/dyaco/ideabussdk_sole/protocol/SoleProtocol.java) lines 2128-2140
+> **Source**: [SoleProtocol.java](apps/sole_fitness_jadx/sources/com/dyaco/ideabussdk_sole/protocol/SoleProtocol.java) lines 2128-2140
 
 These models (SC200 bikes and XS895) have a different extended format that includes:
 - `nowLevel` (resistance level) at offset 18-19
@@ -999,11 +1088,11 @@ FTMS Treadmill Data (UUID `0x2ACD`) follows the Bluetooth FTMS specification:
 
 The decompiled source code is available at:
 
-- [SoleProtocol.java](sole_fitness_jadx/sources/com/dyaco/ideabussdk_sole/protocol/SoleProtocol.java) - Main protocol implementation (~2400 lines)
-- [CommandType.java](sole_fitness_jadx/sources/com/dyaco/ideabussdk_sole/protocol/CommandType.java) - Command constants
-- [WorkoutData.java](sole_fitness_jadx/sources/com/dyaco/ideabussdk_sole/protocol/WorkoutData.java) - Workout data structure
-- [EndWorkoutData.java](sole_fitness_jadx/sources/com/dyaco/ideabussdk_sole/protocol/EndWorkoutData.java) - End workout summary
-- [MyBluetoothLE.java](sole_fitness_jadx/sources/com/dyaco/ideabussdk_sole/bluetooth/MyBluetoothLE.java) - BLE communication layer
+- [SoleProtocol.java](apps/sole_fitness_jadx/sources/com/dyaco/ideabussdk_sole/protocol/SoleProtocol.java) - Main protocol implementation (~2400 lines)
+- [CommandType.java](apps/sole_fitness_jadx/sources/com/dyaco/ideabussdk_sole/protocol/CommandType.java) - Command constants
+- [WorkoutData.java](apps/sole_fitness_jadx/sources/com/dyaco/ideabussdk_sole/protocol/WorkoutData.java) - Workout data structure
+- [EndWorkoutData.java](apps/sole_fitness_jadx/sources/com/dyaco/ideabussdk_sole/protocol/EndWorkoutData.java) - End workout summary
+- [MyBluetoothLE.java](apps/sole_fitness_jadx/sources/com/dyaco/ideabussdk_sole/bluetooth/MyBluetoothLE.java) - BLE communication layer
 
 ---
 
@@ -1088,11 +1177,11 @@ The protocol should work with **SOLE, Spirit, XTERRA, and Fuel** equipment. Here
 
 ### Evidence 1: Shared Dyaco SDK
 
-All brands use the same BLE SDK: `com.dyaco.ideabussdk_sole`. Dyaco is the parent company that manufactures equipment for all these consumer brands. The core protocol implementation in [SoleProtocol.java](sole_fitness_jadx/sources/com/dyaco/ideabussdk_sole/protocol/SoleProtocol.java) is shared across all brands.
+All brands use the same BLE SDK: `com.dyaco.ideabussdk_sole`. Dyaco is the parent company that manufactures equipment for all these consumer brands. The core protocol implementation in [SoleProtocol.java](apps/sole_fitness_jadx/sources/com/dyaco/ideabussdk_sole/protocol/SoleProtocol.java) is shared across all brands.
 
 ### Evidence 2: Brand Constants
 
-From [Global.java](sole_fitness_jadx/sources/com/dyaco/sole/custom/Global.java):40-48:
+From [Global.java](apps/sole_fitness_jadx/sources/com/dyaco/sole/custom/Global.java):40-48:
 
 ```java
 public static int BRAND = 0;
@@ -1104,7 +1193,7 @@ public static final int FUEL = 3;
 
 ### Evidence 3: Brand Detection from Model Number
 
-The app determines the brand from the device's model number (from [SoleProtocol.java](sole_fitness_jadx/sources/com/dyaco/ideabussdk_sole/protocol/SoleProtocol.java):1957-1969):
+The app determines the brand from the device's model number (from [SoleProtocol.java](apps/sole_fitness_jadx/sources/com/dyaco/ideabussdk_sole/protocol/SoleProtocol.java):1957-1969):
 
 | Model Range | Brand |
 |-------------|-------|
@@ -1117,12 +1206,12 @@ The app determines the brand from the device's model number (from [SoleProtocol.
 
 Each brand has its own device name list but uses the **same protocol parser and data structures**:
 
-- [Sole_DeviceModelList.java](sole_fitness_jadx/sources/com/dyaco/sole/custom/Sole_DeviceModelList.java) - F63, F65, F80, F85, E25, E35, etc.
-- [Spirit_DeviceModelList.java](sole_fitness_jadx/sources/com/dyaco/sole/custom/Spirit_DeviceModelList.java) - CT800, XT385, XT485, CE800, etc.
-- [Xterra_DeviceModelList.java](sole_fitness_jadx/sources/com/dyaco/sole/custom/Xterra_DeviceModelList.java) - TR6.65, TRX4500, FS5.8e, etc.
-- [Fuel_DeviceModelList.java](sole_fitness_jadx/sources/com/dyaco/sole/custom/Fuel_DeviceModelList.java) - FT500, FE900, CT100, etc.
+- [Sole_DeviceModelList.java](apps/sole_fitness_jadx/sources/com/dyaco/sole/custom/Sole_DeviceModelList.java) - F63, F65, F80, F85, E25, E35, etc.
+- [Spirit_DeviceModelList.java](apps/sole_fitness_jadx/sources/com/dyaco/sole/custom/Spirit_DeviceModelList.java) - CT800, XT385, XT485, CE800, etc.
+- [Xterra_DeviceModelList.java](apps/sole_fitness_jadx/sources/com/dyaco/sole/custom/Xterra_DeviceModelList.java) - TR6.65, TRX4500, FS5.8e, etc.
+- [Fuel_DeviceModelList.java](apps/sole_fitness_jadx/sources/com/dyaco/sole/custom/Fuel_DeviceModelList.java) - FT500, FE900, CT100, etc.
 
-From [DeviceModelList.java](sole_fitness_jadx/sources/com/dyaco/sole/custom/DeviceModelList.java):61-67:
+From [DeviceModelList.java](apps/sole_fitness_jadx/sources/com/dyaco/sole/custom/DeviceModelList.java):61-67:
 
 ```java
 if (Global.BRAND == 0) {

@@ -1,8 +1,15 @@
 """
 SOLE Fitness BLE Monitor - Monitor your SOLE/Spirit/XTERRA fitness equipment.
+
+This directory contains test scripts and examples. The main library is in src/sole_uart/
 """
 
-from sole_protocol import (
+# Import from the library in src/
+import sys
+from pathlib import Path
+sys.path.insert(0, str(Path(__file__).parent.parent / 'src'))
+
+from sole_uart.protocol import (
     ServiceUUID,
     CharacteristicUUID,
     Command,
@@ -17,7 +24,7 @@ from sole_protocol import (
     CommandBuilder,
 )
 
-from sole_client import (
+from sole_uart.client import (
     SoleDevice,
     SoleMonitor,
     SoleController,
