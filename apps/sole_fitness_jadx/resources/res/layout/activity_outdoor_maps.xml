@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/activity_OutdoorMaps"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <fragment
+        android:name="com.google.android.gms.maps.SupportMapFragment"
+        android:id="@+id/map"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+    <ImageView
+        android:id="@+id/menu_service_map"
+        android:visibility="gone"
+        android:layout_width="@dimen/main_title_icon_size"
+        android:layout_height="@dimen/main_title_icon_size"
+        android:layout_marginTop="20dp"
+        android:src="@drawable/qa_icon_message_csr"
+        android:layout_toRightOf="@+id/menu_pull_message"
+        android:layout_marginStart="20dp"/>
+    <include layout="@layout/sport_launcher_panel"/>
+    <include layout="@layout/sport_dashboard"/>
+    <include layout="@layout/music_control_panel"/>
+    <include layout="@layout/outdoor_321go"/>
+    <com.dyaco.sole.custom_view.ErrorDialog
+        android:id="@+id/errorDialogMap"
+        android:visibility="gone"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+    <com.dyaco.sole.custom_view.QuestMainView
+        android:id="@+id/questMainViewMap"
+        android:visibility="gone"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+</RelativeLayout>

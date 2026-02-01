@@ -1,0 +1,84 @@
+package com.ua.sdk.user;
+
+import android.os.Parcel;
+import android.os.Parcelable;
+import com.ua.sdk.EntityRef;
+import com.ua.sdk.internal.BaseReferenceBuilder;
+import com.ua.sdk.internal.Precondition;
+import com.ua.sdk.internal.net.v7.UrlBuilderImpl;
+
+/* loaded from: classes2.dex */
+public class UserRef implements EntityRef<User> {
+    public static Parcelable.Creator<UserRef> CREATOR = new Parcelable.Creator<UserRef>() { // from class: com.ua.sdk.user.UserRef.1
+        /* JADX WARN: Can't rename method to resolve collision */
+        @Override // android.os.Parcelable.Creator
+        public UserRef createFromParcel(Parcel parcel) {
+            return new UserRef(parcel);
+        }
+
+        /* JADX WARN: Can't rename method to resolve collision */
+        @Override // android.os.Parcelable.Creator
+        public UserRef[] newArray(int i) {
+            return new UserRef[i];
+        }
+    };
+    private final String id;
+
+    @Override // android.os.Parcelable
+    public int describeContents() {
+        return 0;
+    }
+
+    private UserRef(Builder builder) {
+        this.id = builder.id;
+    }
+
+    @Override // com.ua.sdk.Reference
+    public String getId() {
+        String str = this.id;
+        if (str == null || str.length() <= 0) {
+            return null;
+        }
+        return this.id;
+    }
+
+    @Override // com.ua.sdk.Reference
+    public String getHref() {
+        String str = this.id;
+        if (str == null || str.isEmpty()) {
+            return null;
+        }
+        return String.format(UrlBuilderImpl.GET_USER_URL, this.id);
+    }
+
+    public static Builder getBuilder() {
+        return new Builder();
+    }
+
+    public static final class Builder extends BaseReferenceBuilder {
+        private String id;
+
+        private Builder() {
+            super(UrlBuilderImpl.GET_USER_URL);
+        }
+
+        public Builder setId(String str) {
+            this.id = str;
+            return this;
+        }
+
+        public UserRef build() throws NullPointerException {
+            Precondition.isNotNull(this.id, "User Id");
+            return new UserRef(this);
+        }
+    }
+
+    @Override // android.os.Parcelable
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeString(this.id);
+    }
+
+    private UserRef(Parcel parcel) {
+        this.id = parcel.readString();
+    }
+}

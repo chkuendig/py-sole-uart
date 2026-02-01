@@ -1,0 +1,18 @@
+package androidx.health.platform.client.proto;
+
+import java.util.List;
+
+/* loaded from: classes2.dex */
+public interface EnumValueOrBuilder extends MessageLiteOrBuilder {
+    String getName();
+
+    ByteString getNameBytes();
+
+    int getNumber();
+
+    Option getOptions(int index);
+
+    int getOptionsCount();
+
+    List<Option> getOptionsList();
+}

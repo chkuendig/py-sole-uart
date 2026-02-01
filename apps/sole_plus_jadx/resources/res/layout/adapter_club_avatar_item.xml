@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/cv_avatarWrap"
+    android:tag="layout/adapter_club_avatar_item_0"
+    android:layout_width="36dp"
+    android:layout_height="36dp"
+    android:scaleType="centerCrop"
+    android:elevation="0dp"
+    android:outlineSpotShadowColor="@android:color/transparent"
+    app:cardCornerRadius="36dp"
+    app:cardPreventCornerOverlap="false"
+    app:cardUseCompatPadding="false">
+    <TextView
+        android:background="@drawable/bg_circle_line2_white"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+    <androidx.cardview.widget.CardView
+        android:layout_gravity="center"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:scaleType="centerCrop"
+        android:elevation="0dp"
+        android:outlineSpotShadowColor="@android:color/transparent"
+        app:cardCornerRadius="34dp"
+        app:cardPreventCornerOverlap="false"
+        app:cardUseCompatPadding="false">
+        <TextView
+            android:background="@color/colorBackground_raised"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+        <ImageView
+            android:id="@+id/img_avatar"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:scaleType="centerCrop"/>
+    </androidx.cardview.widget.CardView>
+</androidx.cardview.widget.CardView>

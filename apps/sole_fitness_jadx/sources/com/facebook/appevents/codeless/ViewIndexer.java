@@ -1,0 +1,493 @@
+package com.facebook.appevents.codeless;
+
+import android.app.Activity;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.util.Base64;
+import android.util.Log;
+import android.view.View;
+import androidx.core.app.NotificationCompat;
+import com.facebook.AccessToken;
+import com.facebook.FacebookSdk;
+import com.facebook.GraphRequest;
+import com.facebook.GraphResponse;
+import com.facebook.LoggingBehavior;
+import com.facebook.appevents.codeless.ViewIndexer;
+import com.facebook.appevents.codeless.internal.Constants;
+import com.facebook.appevents.codeless.internal.UnityReflection;
+import com.facebook.appevents.codeless.internal.ViewHierarchy;
+import com.facebook.appevents.internal.AppEventUtility;
+import com.facebook.appevents.internal.ViewHierarchyConstants;
+import com.facebook.gamingservices.cloudgaming.internal.SDKConstants;
+import com.facebook.internal.InternalSettings;
+import com.facebook.internal.Logger;
+import com.facebook.internal.ServerProtocol;
+import com.facebook.internal.Utility;
+import com.facebook.internal.instrument.crashshield.CrashShieldHandler;
+import com.facebook.share.internal.ShareConstants;
+import java.io.ByteArrayOutputStream;
+import java.lang.ref.WeakReference;
+import java.util.Arrays;
+import java.util.Locale;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.Callable;
+import java.util.concurrent.FutureTask;
+import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.TimeUnit;
+import kotlin.Deprecated;
+import kotlin.Metadata;
+import kotlin.jvm.JvmStatic;
+import kotlin.jvm.internal.DefaultConstructorMarker;
+import kotlin.jvm.internal.Intrinsics;
+import kotlin.jvm.internal.StringCompanionObject;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+/* compiled from: ViewIndexer.kt */
+@Metadata(d1 = {"\u00008\n\u0002\u0018\u0002\n\u0002\u0010\u0000\n\u0000\n\u0002\u0018\u0002\n\u0002\b\u0002\n\u0002\u0018\u0002\n\u0000\n\u0002\u0018\u0002\n\u0000\n\u0002\u0010\u000e\n\u0000\n\u0002\u0018\u0002\n\u0000\n\u0002\u0010\u0002\n\u0000\n\u0002\u0018\u0002\n\u0002\b\t\b\u0007\u0018\u0000 \u00172\u00020\u0001:\u0002\u0017\u0018B\r\u0012\u0006\u0010\u0002\u001a\u00020\u0003¢\u0006\u0002\u0010\u0004J\u001a\u0010\r\u001a\u00020\u000e2\b\u0010\u000f\u001a\u0004\u0018\u00010\u00102\b\u0010\u0011\u001a\u0004\u0018\u00010\nJ\u0006\u0010\u0012\u001a\u00020\u000eJ\u0010\u0010\u0013\u001a\u00020\u000e2\u0006\u0010\u0014\u001a\u00020\nH\u0002J\u0010\u0010\u0015\u001a\u00020\u000e2\u0006\u0010\u0014\u001a\u00020\nH\u0007J\u0006\u0010\u0016\u001a\u00020\u000eR\u0014\u0010\u0005\u001a\b\u0012\u0004\u0012\u00020\u00030\u0006X\u0082\u0004¢\u0006\u0002\n\u0000R\u0010\u0010\u0007\u001a\u0004\u0018\u00010\bX\u0082\u000e¢\u0006\u0002\n\u0000R\u0010\u0010\t\u001a\u0004\u0018\u00010\nX\u0082\u000e¢\u0006\u0002\n\u0000R\u000e\u0010\u000b\u001a\u00020\fX\u0082\u0004¢\u0006\u0002\n\u0000¨\u0006\u0019"}, d2 = {"Lcom/facebook/appevents/codeless/ViewIndexer;", "", "activity", "Landroid/app/Activity;", "(Landroid/app/Activity;)V", "activityReference", "Ljava/lang/ref/WeakReference;", "indexingTimer", "Ljava/util/Timer;", "previousDigest", "", "uiThreadHandler", "Landroid/os/Handler;", "processRequest", "", ShareConstants.WEB_DIALOG_RESULT_PARAM_REQUEST_ID, "Lcom/facebook/GraphRequest;", "currentDigest", "schedule", "sendToServer", ViewIndexer.TREE_PARAM, "sendToServerUnity", "unschedule", "Companion", "ScreenshotTaker", "facebook-core_release"}, k = 1, mv = {1, 5, 1})
+/* loaded from: classes.dex */
+public final class ViewIndexer {
+    private static final String APP_VERSION_PARAM = "app_version";
+
+    /* renamed from: Companion, reason: from kotlin metadata */
+    public static final Companion INSTANCE = new Companion(null);
+    private static final String PLATFORM_PARAM = "platform";
+    private static final String REQUEST_TYPE = "request_type";
+    private static final String SUCCESS = "success";
+    private static final String TAG;
+    private static final String TREE_PARAM = "tree";
+    private static ViewIndexer instance;
+    private final WeakReference<Activity> activityReference;
+    private Timer indexingTimer;
+    private String previousDigest;
+    private final Handler uiThreadHandler;
+
+    @JvmStatic
+    public static final GraphRequest buildAppIndexingRequest(String str, AccessToken accessToken, String str2, String str3) {
+        if (CrashShieldHandler.isObjectCrashing(ViewIndexer.class)) {
+            return null;
+        }
+        try {
+            return INSTANCE.buildAppIndexingRequest(str, accessToken, str2, str3);
+        } catch (Throwable th) {
+            CrashShieldHandler.handleThrowable(th, ViewIndexer.class);
+            return null;
+        }
+    }
+
+    @JvmStatic
+    public static final void sendToServerUnityInstance(String str) {
+        if (CrashShieldHandler.isObjectCrashing(ViewIndexer.class)) {
+            return;
+        }
+        try {
+            INSTANCE.sendToServerUnityInstance(str);
+        } catch (Throwable th) {
+            CrashShieldHandler.handleThrowable(th, ViewIndexer.class);
+        }
+    }
+
+    public ViewIndexer(Activity activity) {
+        Intrinsics.checkNotNullParameter(activity, "activity");
+        this.activityReference = new WeakReference<>(activity);
+        this.previousDigest = null;
+        this.uiThreadHandler = new Handler(Looper.getMainLooper());
+        instance = this;
+    }
+
+    public static final /* synthetic */ WeakReference access$getActivityReference$p(ViewIndexer viewIndexer) {
+        if (CrashShieldHandler.isObjectCrashing(ViewIndexer.class)) {
+            return null;
+        }
+        try {
+            return viewIndexer.activityReference;
+        } catch (Throwable th) {
+            CrashShieldHandler.handleThrowable(th, ViewIndexer.class);
+            return null;
+        }
+    }
+
+    public static final /* synthetic */ Timer access$getIndexingTimer$p(ViewIndexer viewIndexer) {
+        if (CrashShieldHandler.isObjectCrashing(ViewIndexer.class)) {
+            return null;
+        }
+        try {
+            return viewIndexer.indexingTimer;
+        } catch (Throwable th) {
+            CrashShieldHandler.handleThrowable(th, ViewIndexer.class);
+            return null;
+        }
+    }
+
+    public static final /* synthetic */ ViewIndexer access$getInstance$cp() {
+        if (CrashShieldHandler.isObjectCrashing(ViewIndexer.class)) {
+            return null;
+        }
+        try {
+            return instance;
+        } catch (Throwable th) {
+            CrashShieldHandler.handleThrowable(th, ViewIndexer.class);
+            return null;
+        }
+    }
+
+    public static final /* synthetic */ String access$getPreviousDigest$p(ViewIndexer viewIndexer) {
+        if (CrashShieldHandler.isObjectCrashing(ViewIndexer.class)) {
+            return null;
+        }
+        try {
+            return viewIndexer.previousDigest;
+        } catch (Throwable th) {
+            CrashShieldHandler.handleThrowable(th, ViewIndexer.class);
+            return null;
+        }
+    }
+
+    public static final /* synthetic */ String access$getTAG$cp() {
+        if (CrashShieldHandler.isObjectCrashing(ViewIndexer.class)) {
+            return null;
+        }
+        try {
+            return TAG;
+        } catch (Throwable th) {
+            CrashShieldHandler.handleThrowable(th, ViewIndexer.class);
+            return null;
+        }
+    }
+
+    public static final /* synthetic */ Handler access$getUiThreadHandler$p(ViewIndexer viewIndexer) {
+        if (CrashShieldHandler.isObjectCrashing(ViewIndexer.class)) {
+            return null;
+        }
+        try {
+            return viewIndexer.uiThreadHandler;
+        } catch (Throwable th) {
+            CrashShieldHandler.handleThrowable(th, ViewIndexer.class);
+            return null;
+        }
+    }
+
+    public static final /* synthetic */ void access$sendToServer(ViewIndexer viewIndexer, String str) {
+        if (CrashShieldHandler.isObjectCrashing(ViewIndexer.class)) {
+            return;
+        }
+        try {
+            viewIndexer.sendToServer(str);
+        } catch (Throwable th) {
+            CrashShieldHandler.handleThrowable(th, ViewIndexer.class);
+        }
+    }
+
+    public static final /* synthetic */ void access$setIndexingTimer$p(ViewIndexer viewIndexer, Timer timer) {
+        if (CrashShieldHandler.isObjectCrashing(ViewIndexer.class)) {
+            return;
+        }
+        try {
+            viewIndexer.indexingTimer = timer;
+        } catch (Throwable th) {
+            CrashShieldHandler.handleThrowable(th, ViewIndexer.class);
+        }
+    }
+
+    public static final /* synthetic */ void access$setInstance$cp(ViewIndexer viewIndexer) {
+        if (CrashShieldHandler.isObjectCrashing(ViewIndexer.class)) {
+            return;
+        }
+        try {
+            instance = viewIndexer;
+        } catch (Throwable th) {
+            CrashShieldHandler.handleThrowable(th, ViewIndexer.class);
+        }
+    }
+
+    public static final /* synthetic */ void access$setPreviousDigest$p(ViewIndexer viewIndexer, String str) {
+        if (CrashShieldHandler.isObjectCrashing(ViewIndexer.class)) {
+            return;
+        }
+        try {
+            viewIndexer.previousDigest = str;
+        } catch (Throwable th) {
+            CrashShieldHandler.handleThrowable(th, ViewIndexer.class);
+        }
+    }
+
+    public final void schedule() {
+        if (CrashShieldHandler.isObjectCrashing(this)) {
+            return;
+        }
+        try {
+            final TimerTask timerTask = new TimerTask() { // from class: com.facebook.appevents.codeless.ViewIndexer$schedule$indexingTask$1
+                @Override // java.util.TimerTask, java.lang.Runnable
+                public void run() throws JSONException {
+                    try {
+                        Activity activity = (Activity) ViewIndexer.access$getActivityReference$p(this.this$0).get();
+                        View rootView = AppEventUtility.getRootView(activity);
+                        if (activity != null && rootView != null) {
+                            String simpleName = activity.getClass().getSimpleName();
+                            Intrinsics.checkNotNullExpressionValue(simpleName, "activity.javaClass.simpleName");
+                            if (CodelessManager.getIsAppIndexingEnabled$facebook_core_release()) {
+                                if (InternalSettings.isUnityApp()) {
+                                    UnityReflection.captureViewHierarchy();
+                                    return;
+                                }
+                                FutureTask futureTask = new FutureTask(new ViewIndexer.ScreenshotTaker(rootView));
+                                ViewIndexer.access$getUiThreadHandler$p(this.this$0).post(futureTask);
+                                String str = "";
+                                try {
+                                    str = (String) futureTask.get(1L, TimeUnit.SECONDS);
+                                } catch (Exception e) {
+                                    Log.e(ViewIndexer.access$getTAG$cp(), "Failed to take screenshot.", e);
+                                }
+                                JSONObject jSONObject = new JSONObject();
+                                try {
+                                    jSONObject.put(ViewHierarchyConstants.SCREEN_NAME_KEY, simpleName);
+                                    jSONObject.put("screenshot", str);
+                                    JSONArray jSONArray = new JSONArray();
+                                    jSONArray.put(ViewHierarchy.getDictionaryOfView(rootView));
+                                    jSONObject.put(ViewHierarchyConstants.VIEW_KEY, jSONArray);
+                                } catch (JSONException unused) {
+                                    Log.e(ViewIndexer.access$getTAG$cp(), "Failed to create JSONObject");
+                                }
+                                String string = jSONObject.toString();
+                                Intrinsics.checkNotNullExpressionValue(string, "viewTree.toString()");
+                                ViewIndexer.access$sendToServer(this.this$0, string);
+                            }
+                        }
+                    } catch (Exception e2) {
+                        Log.e(ViewIndexer.access$getTAG$cp(), "UI Component tree indexing failure!", e2);
+                    }
+                }
+            };
+            try {
+                FacebookSdk.getExecutor().execute(new Runnable() { // from class: com.facebook.appevents.codeless.ViewIndexer.schedule.1
+                    @Override // java.lang.Runnable
+                    public final void run() {
+                        if (CrashShieldHandler.isObjectCrashing(this)) {
+                            return;
+                        }
+                        try {
+                            if (CrashShieldHandler.isObjectCrashing(this)) {
+                                return;
+                            }
+                            try {
+                                try {
+                                    Timer timerAccess$getIndexingTimer$p = ViewIndexer.access$getIndexingTimer$p(ViewIndexer.this);
+                                    if (timerAccess$getIndexingTimer$p != null) {
+                                        timerAccess$getIndexingTimer$p.cancel();
+                                    }
+                                    ViewIndexer.access$setPreviousDigest$p(ViewIndexer.this, null);
+                                    Timer timer = new Timer();
+                                    timer.scheduleAtFixedRate(timerTask, 0L, 1000);
+                                    ViewIndexer.access$setIndexingTimer$p(ViewIndexer.this, timer);
+                                } catch (Exception e) {
+                                    Log.e(ViewIndexer.access$getTAG$cp(), "Error scheduling indexing job", e);
+                                }
+                            } catch (Throwable th) {
+                                CrashShieldHandler.handleThrowable(th, this);
+                            }
+                        } catch (Throwable th2) {
+                            CrashShieldHandler.handleThrowable(th2, this);
+                        }
+                    }
+                });
+            } catch (RejectedExecutionException e) {
+                Log.e(TAG, "Error scheduling indexing job", e);
+            }
+        } catch (Throwable th) {
+            CrashShieldHandler.handleThrowable(th, this);
+        }
+    }
+
+    public final void unschedule() {
+        if (CrashShieldHandler.isObjectCrashing(this)) {
+            return;
+        }
+        try {
+            if (this.activityReference.get() != null) {
+                try {
+                    Timer timer = this.indexingTimer;
+                    if (timer != null) {
+                        timer.cancel();
+                    }
+                    this.indexingTimer = null;
+                } catch (Exception e) {
+                    Log.e(TAG, "Error unscheduling indexing job", e);
+                }
+            }
+        } catch (Throwable th) {
+            CrashShieldHandler.handleThrowable(th, this);
+        }
+    }
+
+    @Deprecated(message = "Plase use sendToServerUnityInstance and sendToServerUnity will be removed soon.")
+    public final void sendToServerUnity(String tree) {
+        if (CrashShieldHandler.isObjectCrashing(this)) {
+            return;
+        }
+        try {
+            Intrinsics.checkNotNullParameter(tree, "tree");
+            ViewIndexer viewIndexer = instance;
+            if (viewIndexer != null) {
+                viewIndexer.sendToServer(tree);
+            }
+        } catch (Throwable th) {
+            CrashShieldHandler.handleThrowable(th, this);
+        }
+    }
+
+    private final void sendToServer(final String tree) {
+        if (CrashShieldHandler.isObjectCrashing(this)) {
+            return;
+        }
+        try {
+            FacebookSdk.getExecutor().execute(new Runnable() { // from class: com.facebook.appevents.codeless.ViewIndexer.sendToServer.1
+                @Override // java.lang.Runnable
+                public final void run() {
+                    if (CrashShieldHandler.isObjectCrashing(this)) {
+                        return;
+                    }
+                    try {
+                        if (CrashShieldHandler.isObjectCrashing(this)) {
+                            return;
+                        }
+                        try {
+                            String strMd5hash = Utility.md5hash(tree);
+                            AccessToken currentAccessToken = AccessToken.INSTANCE.getCurrentAccessToken();
+                            if (strMd5hash == null || !Intrinsics.areEqual(strMd5hash, ViewIndexer.access$getPreviousDigest$p(ViewIndexer.this))) {
+                                ViewIndexer.this.processRequest(ViewIndexer.INSTANCE.buildAppIndexingRequest(tree, currentAccessToken, FacebookSdk.getApplicationId(), Constants.APP_INDEXING), strMd5hash);
+                            }
+                        } catch (Throwable th) {
+                            CrashShieldHandler.handleThrowable(th, this);
+                        }
+                    } catch (Throwable th2) {
+                        CrashShieldHandler.handleThrowable(th2, this);
+                    }
+                }
+            });
+        } catch (Throwable th) {
+            CrashShieldHandler.handleThrowable(th, this);
+        }
+    }
+
+    public final void processRequest(GraphRequest request, String currentDigest) {
+        if (CrashShieldHandler.isObjectCrashing(this) || request == null) {
+            return;
+        }
+        try {
+            GraphResponse graphResponseExecuteAndWait = request.executeAndWait();
+            try {
+                JSONObject graphObject = graphResponseExecuteAndWait.getGraphObject();
+                if (graphObject != null) {
+                    if (Intrinsics.areEqual(ServerProtocol.DIALOG_RETURN_SCOPES_TRUE, graphObject.optString("success"))) {
+                        Logger.INSTANCE.log(LoggingBehavior.APP_EVENTS, TAG, "Successfully send UI component tree to server");
+                        this.previousDigest = currentDigest;
+                    }
+                    if (graphObject.has(Constants.APP_INDEXING_ENABLED)) {
+                        CodelessManager.updateAppIndexing$facebook_core_release(graphObject.getBoolean(Constants.APP_INDEXING_ENABLED));
+                        return;
+                    }
+                    return;
+                }
+                Log.e(TAG, "Error sending UI component tree to Facebook: " + graphResponseExecuteAndWait.getError());
+            } catch (JSONException e) {
+                Log.e(TAG, "Error decoding server response.", e);
+            }
+        } catch (Throwable th) {
+            CrashShieldHandler.handleThrowable(th, this);
+        }
+    }
+
+    /* JADX INFO: Access modifiers changed from: private */
+    /* compiled from: ViewIndexer.kt */
+    @Metadata(d1 = {"\u0000\u001c\n\u0002\u0018\u0002\n\u0002\u0018\u0002\n\u0002\u0010\u000e\n\u0000\n\u0002\u0018\u0002\n\u0000\n\u0002\u0018\u0002\n\u0002\b\u0002\b\u0002\u0018\u00002\b\u0012\u0004\u0012\u00020\u00020\u0001B\u000f\b\u0000\u0012\u0006\u0010\u0003\u001a\u00020\u0004¢\u0006\u0002\u0010\u0005J\b\u0010\u0007\u001a\u00020\u0002H\u0016R\u0014\u0010\u0003\u001a\b\u0012\u0004\u0012\u00020\u00040\u0006X\u0082\u0004¢\u0006\u0002\n\u0000¨\u0006\b"}, d2 = {"Lcom/facebook/appevents/codeless/ViewIndexer$ScreenshotTaker;", "Ljava/util/concurrent/Callable;", "", "rootView", "Landroid/view/View;", "(Landroid/view/View;)V", "Ljava/lang/ref/WeakReference;", NotificationCompat.CATEGORY_CALL, "facebook-core_release"}, k = 1, mv = {1, 5, 1})
+    static final class ScreenshotTaker implements Callable<String> {
+        private final WeakReference<View> rootView;
+
+        public ScreenshotTaker(View rootView) {
+            Intrinsics.checkNotNullParameter(rootView, "rootView");
+            this.rootView = new WeakReference<>(rootView);
+        }
+
+        @Override // java.util.concurrent.Callable
+        public String call() {
+            View view = this.rootView.get();
+            if (view == null || view.getWidth() == 0 || view.getHeight() == 0) {
+                return "";
+            }
+            Bitmap bitmapCreateBitmap = Bitmap.createBitmap(view.getWidth(), view.getHeight(), Bitmap.Config.RGB_565);
+            view.draw(new Canvas(bitmapCreateBitmap));
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            bitmapCreateBitmap.compress(Bitmap.CompressFormat.JPEG, 10, byteArrayOutputStream);
+            String strEncodeToString = Base64.encodeToString(byteArrayOutputStream.toByteArray(), 2);
+            Intrinsics.checkNotNullExpressionValue(strEncodeToString, "Base64.encodeToString(ou…eArray(), Base64.NO_WRAP)");
+            return strEncodeToString;
+        }
+    }
+
+    /* compiled from: ViewIndexer.kt */
+    @Metadata(d1 = {"\u00002\n\u0002\u0018\u0002\n\u0002\u0010\u0000\n\u0002\b\u0002\n\u0002\u0010\u000e\n\u0002\b\u0006\n\u0002\u0018\u0002\n\u0000\n\u0002\u0018\u0002\n\u0002\b\u0002\n\u0002\u0018\u0002\n\u0002\b\u0003\n\u0002\u0010\u0002\n\u0002\b\u0002\b\u0086\u0003\u0018\u00002\u00020\u0001B\u0007\b\u0002¢\u0006\u0002\u0010\u0002J0\u0010\f\u001a\u0004\u0018\u00010\r2\b\u0010\u000e\u001a\u0004\u0018\u00010\u00042\b\u0010\u000f\u001a\u0004\u0018\u00010\u00102\b\u0010\u0011\u001a\u0004\u0018\u00010\u00042\u0006\u0010\u0012\u001a\u00020\u0004H\u0007J\u0010\u0010\u0013\u001a\u00020\u00142\u0006\u0010\u0015\u001a\u00020\u0004H\u0007R\u000e\u0010\u0003\u001a\u00020\u0004X\u0082T¢\u0006\u0002\n\u0000R\u000e\u0010\u0005\u001a\u00020\u0004X\u0082T¢\u0006\u0002\n\u0000R\u000e\u0010\u0006\u001a\u00020\u0004X\u0082T¢\u0006\u0002\n\u0000R\u000e\u0010\u0007\u001a\u00020\u0004X\u0082T¢\u0006\u0002\n\u0000R\u000e\u0010\b\u001a\u00020\u0004X\u0082\u0004¢\u0006\u0002\n\u0000R\u000e\u0010\t\u001a\u00020\u0004X\u0082T¢\u0006\u0002\n\u0000R\u0010\u0010\n\u001a\u0004\u0018\u00010\u000bX\u0082\u000e¢\u0006\u0002\n\u0000¨\u0006\u0016"}, d2 = {"Lcom/facebook/appevents/codeless/ViewIndexer$Companion;", "", "()V", "APP_VERSION_PARAM", "", "PLATFORM_PARAM", "REQUEST_TYPE", "SUCCESS", "TAG", "TREE_PARAM", "instance", "Lcom/facebook/appevents/codeless/ViewIndexer;", "buildAppIndexingRequest", "Lcom/facebook/GraphRequest;", "appIndex", SDKConstants.PARAM_ACCESS_TOKEN, "Lcom/facebook/AccessToken;", "appId", "requestType", "sendToServerUnityInstance", "", ViewIndexer.TREE_PARAM, "facebook-core_release"}, k = 1, mv = {1, 5, 1})
+    public static final class Companion {
+        private Companion() {
+        }
+
+        public /* synthetic */ Companion(DefaultConstructorMarker defaultConstructorMarker) {
+            this();
+        }
+
+        @JvmStatic
+        public final void sendToServerUnityInstance(String tree) {
+            Intrinsics.checkNotNullParameter(tree, "tree");
+            ViewIndexer viewIndexerAccess$getInstance$cp = ViewIndexer.access$getInstance$cp();
+            if (viewIndexerAccess$getInstance$cp != null) {
+                ViewIndexer.access$sendToServer(viewIndexerAccess$getInstance$cp, tree);
+            }
+        }
+
+        @JvmStatic
+        public final GraphRequest buildAppIndexingRequest(String appIndex, AccessToken accessToken, String appId, String requestType) {
+            Intrinsics.checkNotNullParameter(requestType, "requestType");
+            if (appIndex == null) {
+                return null;
+            }
+            GraphRequest.Companion companion = GraphRequest.INSTANCE;
+            StringCompanionObject stringCompanionObject = StringCompanionObject.INSTANCE;
+            String str = String.format(Locale.US, "%s/app_indexing", Arrays.copyOf(new Object[]{appId}, 1));
+            Intrinsics.checkNotNullExpressionValue(str, "java.lang.String.format(locale, format, *args)");
+            GraphRequest graphRequestNewPostRequest = companion.newPostRequest(accessToken, str, null, null);
+            Bundle parameters = graphRequestNewPostRequest.getParameters();
+            if (parameters == null) {
+                parameters = new Bundle();
+            }
+            parameters.putString(ViewIndexer.TREE_PARAM, appIndex);
+            parameters.putString(ViewIndexer.APP_VERSION_PARAM, AppEventUtility.getAppVersion());
+            parameters.putString(ViewIndexer.PLATFORM_PARAM, Constants.PLATFORM);
+            parameters.putString(ViewIndexer.REQUEST_TYPE, requestType);
+            if (Intrinsics.areEqual(requestType, Constants.APP_INDEXING)) {
+                parameters.putString(Constants.DEVICE_SESSION_ID, CodelessManager.getCurrentDeviceSessionID$facebook_core_release());
+            }
+            graphRequestNewPostRequest.setParameters(parameters);
+            graphRequestNewPostRequest.setCallback(new GraphRequest.Callback() { // from class: com.facebook.appevents.codeless.ViewIndexer$Companion$buildAppIndexingRequest$1
+                @Override // com.facebook.GraphRequest.Callback
+                public final void onCompleted(GraphResponse it) {
+                    Intrinsics.checkNotNullParameter(it, "it");
+                    Logger.INSTANCE.log(LoggingBehavior.APP_EVENTS, ViewIndexer.access$getTAG$cp(), "App index sent to FB!");
+                }
+            });
+            return graphRequestNewPostRequest;
+        }
+    }
+
+    static {
+        String canonicalName = ViewIndexer.class.getCanonicalName();
+        if (canonicalName == null) {
+            canonicalName = "";
+        }
+        Intrinsics.checkNotNullExpressionValue(canonicalName, "ViewIndexer::class.java.canonicalName ?: \"\"");
+        TAG = canonicalName;
+    }
+}

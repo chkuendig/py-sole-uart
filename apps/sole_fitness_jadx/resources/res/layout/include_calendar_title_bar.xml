@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:background="@color/black"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+    <RelativeLayout
+        android:background="@color/transparent"
+        android:paddingTop="5dp"
+        android:paddingBottom="5dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <ImageView
+            android:id="@+id/calendar_prev_textview"
+            android:layout_width="@dimen/calendar_title_button_size"
+            android:layout_height="@dimen/calendar_title_button_size"
+            android:src="@drawable/all_btn_a_4"
+            android:layout_toStartOf="@+id/calendar_title_textview"/>
+        <com.dyaco.sole.custom_view.TypefaceTextView
+            android:textAppearance="@android:style/TextAppearance.Medium"
+            android:textColor="@color/light_gray"
+            android:gravity="center"
+            android:id="@+id/calendar_title_textview"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:text="current date"
+            android:layout_centerInParent="true"/>
+        <ImageView
+            android:id="@+id/calendar_next_textview"
+            android:layout_width="@dimen/calendar_title_button_size"
+            android:layout_height="@dimen/calendar_title_button_size"
+            android:src="@drawable/all_btn_a_2"
+            android:layout_toEndOf="@+id/calendar_title_textview"/>
+        <ImageView
+            android:id="@+id/totalchart"
+            android:layout_width="@dimen/calendar_title_button_size"
+            android:layout_height="@dimen/calendar_title_button_size"
+            android:src="@drawable/chart_bt_w"
+            android:layout_alignParentRight="false"
+            android:layout_marginEnd="10dp"
+            android:layout_alignParentEnd="true"/>
+    </RelativeLayout>
+</LinearLayout>

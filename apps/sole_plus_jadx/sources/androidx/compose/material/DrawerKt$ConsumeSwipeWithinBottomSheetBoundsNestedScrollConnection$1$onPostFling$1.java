@@ -1,0 +1,32 @@
+package androidx.compose.material;
+
+import androidx.compose.material.DrawerKt;
+import androidx.constraintlayout.core.motion.utils.TypedValues;
+import kotlin.Metadata;
+import kotlin.coroutines.Continuation;
+import kotlin.coroutines.jvm.internal.ContinuationImpl;
+import kotlin.coroutines.jvm.internal.DebugMetadata;
+
+/* compiled from: Drawer.kt */
+@Metadata(k = 3, mv = {1, 8, 0}, xi = 48)
+@DebugMetadata(c = "androidx.compose.material.DrawerKt$ConsumeSwipeWithinBottomSheetBoundsNestedScrollConnection$1", f = "Drawer.kt", i = {0}, l = {TypedValues.Custom.TYPE_INT}, m = "onPostFling-RZ2iAVY", n = {"available"}, s = {"J$0"})
+/* loaded from: classes.dex */
+final class DrawerKt$ConsumeSwipeWithinBottomSheetBoundsNestedScrollConnection$1$onPostFling$1 extends ContinuationImpl {
+    long J$0;
+    int label;
+    /* synthetic */ Object result;
+    final /* synthetic */ DrawerKt.C05121 this$0;
+
+    /* JADX WARN: 'super' call moved to the top of the method (can break code semantics) */
+    DrawerKt$ConsumeSwipeWithinBottomSheetBoundsNestedScrollConnection$1$onPostFling$1(DrawerKt.C05121 c05121, Continuation<? super DrawerKt$ConsumeSwipeWithinBottomSheetBoundsNestedScrollConnection$1$onPostFling$1> continuation) {
+        super(continuation);
+        this.this$0 = c05121;
+    }
+
+    @Override // kotlin.coroutines.jvm.internal.BaseContinuationImpl
+    public final Object invokeSuspend(Object obj) {
+        this.result = obj;
+        this.label |= Integer.MIN_VALUE;
+        return this.this$0.mo786onPostFlingRZ2iAVY(0L, 0L, this);
+    }
+}

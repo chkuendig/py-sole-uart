@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:tag="layout/adapter_goals_top_item_0"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+    <LinearLayout
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:id="@+id/LL_setRestTime"
+        android:background="@drawable/bg_corner24_raised"
+        android:padding="@dimen/padding_16"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/margin_12"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+        <ImageView
+            android:id="@+id/imageView28"
+            android:background="@drawable/dashed_line"
+            android:padding="@dimen/padding_16"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            app:srcCompat="@drawable/ic_m__plus_heavy"
+            app:tint="@color/colorGlobal_accent"/>
+        <TextView
+            android:textSize="@dimen/text_size_17"
+            android:textColor="@color/colorLabel_accent"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@string/add_goal"
+            android:layout_weight="1"
+            android:fontFamily="@font/inter_semibold_600"
+            android:layout_marginStart="@dimen/margin_12"/>
+    </LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

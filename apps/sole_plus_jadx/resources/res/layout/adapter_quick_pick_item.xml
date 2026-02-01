@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:tag="layout/adapter_quick_pick_item_0"
+    android:background="@drawable/bg_corner28_outline"
+    android:paddingTop="@dimen/padding_12"
+    android:paddingBottom="@dimen/padding_12"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_margin="6dp"
+    android:minHeight="48dp"
+    android:paddingStart="@dimen/padding_16"
+    android:paddingEnd="@dimen/padding_16">
+    <ImageView
+        android:id="@+id/img_icon"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:src="@drawable/ic_stats_timer_fill"
+        android:layout_marginEnd="8dp"
+        app:tint="@color/colorLabel_label3"/>
+    <TextView
+        android:textSize="@dimen/text_size_17"
+        android:textColor="@color/colorLabel_label1"
+        android:id="@+id/tv_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="15 min"
+        android:fontFamily="@font/inter_semibold_600"/>
+</LinearLayout>

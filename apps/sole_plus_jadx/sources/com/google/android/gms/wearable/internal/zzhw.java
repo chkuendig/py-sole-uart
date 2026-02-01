@@ -1,0 +1,30 @@
+package com.google.android.gms.wearable.internal;
+
+import android.os.Parcel;
+import android.os.Parcelable;
+import com.google.android.gms.common.internal.safeparcel.AbstractSafeParcelable;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelWriter;
+
+/* compiled from: com.google.android.gms:play-services-wearable@@18.1.0 */
+/* loaded from: classes4.dex */
+public final class zzhw extends AbstractSafeParcelable {
+    public static final Parcelable.Creator<zzhw> CREATOR = new zzhx();
+    public final int zza;
+    public final int zzb;
+    public final byte[] zzc;
+
+    public zzhw(int i, int i2, byte[] bArr) {
+        this.zza = i;
+        this.zzb = i2;
+        this.zzc = bArr;
+    }
+
+    @Override // android.os.Parcelable
+    public final void writeToParcel(Parcel parcel, int i) {
+        int iBeginObjectHeader = SafeParcelWriter.beginObjectHeader(parcel);
+        SafeParcelWriter.writeInt(parcel, 1, this.zza);
+        SafeParcelWriter.writeInt(parcel, 2, this.zzb);
+        SafeParcelWriter.writeByteArray(parcel, 3, this.zzc, false);
+        SafeParcelWriter.finishObjectHeader(parcel, iBeginObjectHeader);
+    }
+}

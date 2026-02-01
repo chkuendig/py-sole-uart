@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:tag="layout/adapter_classes_results_0"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+    <LinearLayout
+        android:orientation="vertical"
+        android:id="@+id/LL_filterResultView"
+        android:visibility="visible"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/margin_20"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+        <LinearLayout
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <TextView
+                android:textSize="@dimen/text_size_21"
+                android:textColor="@color/colorLabel_label1"
+                android:id="@+id/txt_resultsCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0 Results"
+                android:layout_weight="1"
+                android:fontFamily="@font/inter_extrabold_800"/>
+            <LinearLayout
+                android:gravity="center"
+                android:orientation="vertical"
+                android:layout_width="44dp"
+                android:layout_height="44dp">
+                <ImageView
+                    android:id="@+id/img_deleteFilter"
+                    android:background="@drawable/bg_corner28_raised"
+                    android:padding="@dimen/padding_4"
+                    android:layout_width="@dimen/img_size_24"
+                    android:layout_height="@dimen/img_size_24"
+                    app:srcCompat="@drawable/ic_s__xmark"
+                    app:tint="@color/colorLabel_label3"/>
+            </LinearLayout>
+        </LinearLayout>
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <TextView
+                android:textSize="@dimen/text_size_15"
+                android:textColor="@color/colorLabel_label2"
+                android:id="@+id/txt_filterCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="1 filter applied"
+                android:layout_weight="1"
+                android:fontFamily="@font/inter_semibold_600"/>
+        </LinearLayout>
+    </LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

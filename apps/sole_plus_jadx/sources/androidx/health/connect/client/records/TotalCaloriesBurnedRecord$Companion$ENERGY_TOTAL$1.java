@@ -1,0 +1,24 @@
+package androidx.health.connect.client.records;
+
+import androidx.health.connect.client.units.Energy;
+import kotlin.Metadata;
+import kotlin.jvm.functions.Function1;
+import kotlin.jvm.internal.FunctionReferenceImpl;
+
+/* compiled from: TotalCaloriesBurnedRecord.kt */
+@Metadata(k = 3, mv = {1, 8, 0}, xi = 48)
+/* loaded from: classes2.dex */
+/* synthetic */ class TotalCaloriesBurnedRecord$Companion$ENERGY_TOTAL$1 extends FunctionReferenceImpl implements Function1<Double, Energy> {
+    TotalCaloriesBurnedRecord$Companion$ENERGY_TOTAL$1(Object obj) {
+        super(1, obj, Energy.Companion.class, "kilocalories", "kilocalories(D)Landroidx/health/connect/client/units/Energy;", 0);
+    }
+
+    public final Energy invoke(double d) {
+        return ((Energy.Companion) this.receiver).kilocalories(d);
+    }
+
+    @Override // kotlin.jvm.functions.Function1
+    public /* bridge */ /* synthetic */ Energy invoke(Double d) {
+        return invoke(d.doubleValue());
+    }
+}

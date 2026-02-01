@@ -1,0 +1,21 @@
+package com.soletreadmills.sole_v2.ble.type;
+
+/* loaded from: classes5.dex */
+public enum TrainingStatusType {
+    OTHER,
+    IDLE,
+    WARMING_UP,
+    LOW_INTENSITY_INTERVAL,
+    HIGH_INTENSITY_INTERVAL,
+    RECOVERY_INTERVAL,
+    ISOMETRIC,
+    HEART_RATE_CONTROL,
+    FITNESS_TEST,
+    SPEED_OUTSIDE_OF_CONTROL_REGION_LOW,
+    SPEED_OUTSIDE_OF_CONTROL_REGION_HIGH,
+    COOL_DOWN,
+    WATT_CONTROL,
+    MANUAL_MODE_QUICK_START,
+    PRE_WORKOUT,
+    POST_WORKOUT
+}

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:background="@color/black"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+    <RelativeLayout
+        android:id="@+id/display_number_layout"
+        android:layout_width="@dimen/display_number_name_width"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/display_number_margin_start_end"
+        android:layout_marginEnd="@dimen/display_number_margin_start_end">
+        <com.dyaco.sole.custom_view.TypefaceTextView
+            android:textSize="@dimen/profiles_info_text_size"
+            android:textColor="@color/light_gray"
+            android:gravity="center"
+            android:id="@+id/display_number_name_textview"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/distance"
+            android:maxLines="1"
+            android:layout_centerHorizontal="true"/>
+        <com.dyaco.sole.custom_view.TypefaceTextView
+            android:textSize="@dimen/display_number_text_size"
+            android:textColor="@color/display_number_blue"
+            android:gravity="center"
+            android:layout_gravity="center"
+            android:id="@+id/display_number_textview"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="0"
+            android:lines="1"
+            android:layout_below="@+id/display_number_name_textview"/>
+    </RelativeLayout>
+</LinearLayout>

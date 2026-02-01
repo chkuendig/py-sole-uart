@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <LinearLayout
+        android:orientation="vertical"
+        android:background="@color/white"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <TextView
+            android:textSize="@dimen/workout_data_chart_title_size"
+            android:gravity="center"
+            android:id="@+id/workout_data_chart_title"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/workout_data_chart_title_height"
+            android:text="@string/workout_data_chart_title"/>
+        <TextView
+            android:textSize="@dimen/workout_data_chart_title_size2"
+            android:gravity="center"
+            android:id="@+id/workout_data_chart_title2"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/workout_data_chart_title_height2"
+            android:text="@string/workout_data_chart_title2"/>
+        <com.dyaco.sole.fragment.calendar.WorkoutChart
+            android:id="@+id/workoutchartWrapper"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+        <com.dyaco.sole.fragment.calendar.WorkoutTotalChart
+            android:id="@+id/workouttotalchartWrapper"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+    </LinearLayout>
+</RelativeLayout>

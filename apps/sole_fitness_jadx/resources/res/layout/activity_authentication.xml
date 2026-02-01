@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <WebView
+        android:id="@+id/wvAuthorise"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+    <com.dyaco.sole.custom_view.ErrorDialog
+        android:id="@+id/errorDialogGarmin"
+        android:visibility="gone"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+    <com.dyaco.sole.custom_view.QuestMainView
+        android:id="@+id/questMainViewGarmin"
+        android:visibility="gone"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+</RelativeLayout>

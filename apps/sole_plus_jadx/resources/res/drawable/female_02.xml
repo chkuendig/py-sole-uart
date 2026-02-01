@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:height="400dp"
+    android:width="400dp"
+    android:viewportWidth="400"
+    android:viewportHeight="400">
+    <group>
+        <clip-path android:pathData="M0,0h400v400h-400z"/>
+        <path
+            android:fillColor="#f4e5da"
+            android:pathData="M400,0H0V400H400V0Z"/>
+        <path
+            android:fillColor="#c7595c"
+            android:pathData="M337.39,400.84C341.6,356.68 297.47,300.33 260.95,260.86C225.14,234.96 175.94,265.07 143.77,291.17C129.46,303.76 114.68,332.17 96.72,399.69L337.39,400.84Z"/>
+        <path
+            android:fillColor="#f6a55c"
+            android:pathData="M298.18,149.54L282.9,103.66C246.54,99.24 207.73,177.51 210.86,261.78C229.48,271.4 248.03,276.27 260.2,260.56L260.37,212.24C264.18,211.76 279.44,211.04 283.51,210.64C293.46,209.79 293.81,202.79 294.38,194.43L292.83,171.88C305.55,170.95 302.25,159.73 298.18,149.54Z"/>
+        <path
+            android:fillColor="#d07d38"
+            android:pathData="M237.95,208.7C236.59,206.64 259.4,260.91 260.2,260.56L260.37,212.24L261.27,212.14L237.95,208.7Z"/>
+        <path
+            android:fillColor="#e88f3f"
+            android:pathData="M282.9,103.66C253.14,106.95 229.89,160.36 236.98,181.58C259.57,122.53 278.03,120.32 286,112.37C285.72,111.62 282.48,103.91 282.9,103.66Z"/>
+        <path
+            android:fillColor="#00000000"
+            android:pathData="M181.1,277.15C196.5,285.1 201.92,304.06 196.16,319.97L168.84,397.89"
+            android:strokeColor="#e67073"
+            android:strokeWidth="3"
+            android:strokeLineCap="round"
+            android:strokeLineJoin="round"/>
+        <path
+            android:fillColor="#ffc966"
+            android:pathData="M282.9,103.66C264.33,121.97 238.59,126.4 236.09,201.05C237.38,322.45 177.04,262.18 169.26,357.47L47.77,350.2C48.05,322.48 53.36,279.87 97.85,244.82C127.73,223.76 147.54,207.76 152.66,173.58C157.84,107.64 229.49,60.72 282.9,103.66Z"/>
+    </group>
+</vector>

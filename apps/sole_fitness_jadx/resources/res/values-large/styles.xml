@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Base.Theme.AppCompat.DialogWhenLarge" parent="@style/Base.Theme.AppCompat.Dialog.FixedSize">
+    </style>
+    <style name="Base.Theme.AppCompat.Light.DialogWhenLarge" parent="@style/Base.Theme.AppCompat.Light.Dialog.FixedSize">
+    </style>
+    <style name="CommonNumberPicker" parent="">
+        <item name="android:orientation">1</item>
+        <item name="android:fadingEdge">0x2000</item>
+        <item name="android:fadingEdgeLength">50dp</item>
+        <item name="internalLayout">@layout/view_number_picker_wheel</item>
+        <item name="internalMaxHeight">240dp</item>
+        <item name="internalMinWidth">64dp</item>
+        <item name="middleTextColor">@color/white</item>
+        <item name="middleTextSize">40sp</item>
+        <item name="selectionDividerHeight">1dp</item>
+        <item name="solidColor">#e0e0e0</item>
+        <item name="virtualButtonTextAlpha">120</item>
+        <item name="virtualButtonTextSize">30sp</item>
+    </style>
+</resources>

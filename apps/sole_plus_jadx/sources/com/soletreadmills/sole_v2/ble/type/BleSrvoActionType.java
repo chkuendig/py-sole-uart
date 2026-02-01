@@ -1,0 +1,14 @@
+package com.soletreadmills.sole_v2.ble.type;
+
+/* loaded from: classes5.dex */
+public enum BleSrvoActionType {
+    SRVO_ACTION_GATT_CONNECTED,
+    SRVO_ACTION_GATT_CONNECTING,
+    SRVO_ACTION_GATT_DISCONNECTED,
+    SRVO_ACTION_DEVICE_READY,
+    SRVO_ACTION_GATT_SERVICES_DISCOVERED,
+    SRVO_EXTRA_GATT_ADDRESS,
+    SRVO_ACTION_DATA_AVAILABLE,
+    SRVO_EXTRA_DATA,
+    SRVO_EXTRA_DATA_TYPE
+}
