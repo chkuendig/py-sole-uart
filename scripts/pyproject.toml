@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sole-monitor"
+version = "0.1.0"
+description = "BLE client for monitoring SOLE/Spirit/XTERRA fitness equipment"
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.10"
+dependencies = [
+    "bleak>=0.21.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "pytest-asyncio>=0.21.0",
+]
+
+[project.scripts]
+sole-monitor = "example:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
